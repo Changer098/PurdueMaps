@@ -8,12 +8,14 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/js/bootstrap-select.min.js"></script>
+  <script src="https://www.jsdelivr.com/package/npm/pdfjs-dist"></script>
     <script type="text/javascript">
-        jsonData = null;
-        activeBuilding = null;
-        activeFloor = null;
-        filename = null;
-        fileLocation = "/file/"
+        var jsonData = null;
+        var activeBuilding = null;
+        var activeFloor = null;
+        var filename = null;
+        var fileLocation = "/file/";
+        var pdfjsLib = window('pdfjs-dist/build/pdf');
         $(function() {
 
           $('#buildingpicker').on('change', function(){
@@ -119,11 +121,12 @@
             else {
                 activeFloor = selected;
                 data = jsonData[activeBuilding].find(function(element) { return element[0] == activeFloor;});
-                filename = data[1];
+                filename = data[1].substr(0, data[1].indexOf('.'));
                 //$('#filename').text(filename);
-                $('#pdfFrame').attr('src', fileLocation + filename);
+                /*$('#pdfFrame').attr('src', fileLocation + filename + '.pdf');
                 $('#pdfFrame').show();
-                setLocation(filename);
+                setLocation(filename);*/
+                renderPdf(fileLocation + filename + '.pdf');
             }
         }
         function clearMap() {
@@ -140,6 +143,9 @@
             else {
                 history.replaceState(history, "Maps", loc);
             }
+        }
+        function renderPdf(pdfUrl) {
+            
         }
     </script>
 
@@ -165,7 +171,8 @@
 </div>
 <br />
 <div style="position: absolute; left: 0; right: 0; bottom: 0.5%; top: 13%;">
-    <iframe src="" id="pdfFrame" hidden="true" height="100%" width="100%"></iframe>
+    <!--<iframe src="" id="pdfFrame" hidden="true" height="100%" width="100%"></iframe>-->
+    <canvas id="pdfCanvas"></canvas>
 </div>
 </body>
 </html>

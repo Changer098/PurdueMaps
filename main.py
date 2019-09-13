@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_file
+from flask import Flask, render_template, send_file, send_from_directory
 from os import walk
 import re
 import json
@@ -6,11 +6,11 @@ import json
 
 class main:
     app = Flask(__name__)
-    PDF_LOCATION = "C:\\Users\\everettr\\Documents\\PDF\\"
-    # PDF_LOCATION = "/home/ONEPURDUE/everettr/PDF/"
+    # PDF_LOCATION = "C:\\Users\\everettr\\Documents\\PDF\\"
+    PDF_LOCATION = "/home/ryan/PDF/"
     buildings = dict()  # buildings -> list(tuple(floor, filename)
     jString = None
-    matchReg = re.compile("[a-zA-Z]+-[a-zA-Z0-9]+.pdf")
+    matchReg = re.compile("[a-zA-Z]+-[a-zA-Z0-9]+")
     splitReg = re.compile("[-\.]")
 
     def __init__(self):
@@ -61,6 +61,17 @@ class main:
     @app.route('/file/<string:filename>')
     def file(filename):
         return send_file(main.PDF_LOCATION + filename)
+
+    @app.route('/static/<path:path>')
+    def staticfiles(path):
+        mimetype = 'text/html'
+        if '.js' in path:
+            mimetype = 'text/javascript'
+        elif '.css' in path:
+            mimetype = 'text/css'
+        elif '.html' in path:
+            mimetype = 'text/html'
+        return send_from_directory('static', path, mimetype=mimetype)
 
     def run(self):
         self.app.env = "development"

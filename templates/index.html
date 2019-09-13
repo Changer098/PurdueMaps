@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--https://getbootstrap.com/docs/4.2/examples/cover/#-->
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/css/bootstrap-select.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/js/bootstrap-select.min.js"></script>
+    <script type="text/javascript">
+        jsonData = null;
+        activeBuilding = null;
+        activeFloor = null;
+        filename = null;
+        fileLocation = "/file/"
+        $(function() {
+
+          $('#buildingpicker').on('change', function(){
+            var selected = $(this).val();
+            if (activeFloor != null) {
+                activeFloor = null;
+                filename = null;
+                clearMap();
+            }
+            showFloors(selected);
+          });
+          $('#floorpicker').on('change', function() {
+            var selected = $(this).val();
+            //alert("Selected floor: " + selected + " on building: " + activeBuilding);
+            showMap(selected);
+          });
+        });
+
+        function load() {
+            sortBuildings();
+            jsonData = JSON.parse(document.getElementById("buildings").value);
+            loadBuildings(jsonData);
+            $('#floorpicker').selectpicker('hide');
+            $('#buildingpicker').selectpicker('deselectAll');
+            if (location.pathname != '/') {
+                if ($('#storedFileData').val() == "True") {
+                    console.log("Already got data");
+                    $('#buildingpicker').val($('#buildingName').val());
+                    $('#buildingpicker').selectpicker('refresh');
+                    $('#buildingpicker').change();
+                    $('#floorpicker').val($('#floorName').val());
+                    $('#floorpicker').selectpicker('refresh');
+                    $('#floorpicker').change();
+                }
+                else {
+                    alert("Invalid filename!");
+                }
+            }
+        }
+        function sortBuildings() {
+            var original = document.getElementById("buildings").value;
+            var obj = JSON.parse(original);
+            var buildings = Object.keys(obj).sort();
+            var sortedobj = {};
+            buildings.forEach(building => {
+                sortedobj[building] = obj[building];
+            });
+            document.getElementById("buildings").value = JSON.stringify(sortedobj);
+            console.log(sortedobj);
+        }
+        function loadBuildings(jsonData) {
+            //clear it
+            $('#buildingpicker').children().remove()
+            $('#buildingpicker').selectpicker('refresh');
+            $("#buildingpicker").append($('<option>', {
+                    value: "",
+                    text: ""
+                }));
+            // add all the buildings
+            buildings = Object.keys(jsonData);
+            buildings.forEach(building => {
+                $("#buildingpicker").append($('<option>', {
+                    value: building,
+                    text: building
+                }));
+            });
+            $('#buildingpicker').selectpicker('refresh');
+        }
+        function showFloors(selected) {
+            if (selected === "") {
+                activeBuilding = null;
+                $('#floorpicker').children().remove()
+                $('#floorpicker').selectpicker('refresh');
+                return;
+            }
+            activeBuilding = selected;
+            // console.log(jsonData[selected]);
+            // clear options
+            $('#floorpicker').children().remove()
+            $('#floorpicker').selectpicker('refresh');
+            // refresh
+            $("#floorpicker").append($('<option>', {
+                    value: "",
+                    text: ""
+                }));
+            jsonData[selected].forEach(function(floor) {
+                $("#floorpicker").append($('<option>', {
+                    value: floor[0],
+                    text: floor[0]
+                }));
+            });
+            $('#floorpicker').selectpicker('refresh');
+            $('#floorpicker').selectpicker('show');
+            // show
+        }
+        function showMap(selected) {
+            if (selected === "") {
+                activeFloor = null;
+                $('#filename').hide();
+                $('#pdfFrame').hide();
+                setLocation('/');
+            }
+            else {
+                activeFloor = selected;
+                data = jsonData[activeBuilding].find(function(element) { return element[0] == activeFloor;});
+                filename = data[1];
+                //$('#filename').text(filename);
+                $('#pdfFrame').attr('src', fileLocation + filename);
+                $('#pdfFrame').show();
+                setLocation(filename);
+            }
+        }
+        function clearMap() {
+            activeFloor = null;
+            $('#filename').hide();
+            $('#pdfFrame').hide();
+            setLocation('/')
+        }
+        function setLocation(loc) {
+            var currentState = history.state;
+            if (currentState == null) {
+                history.pushState(null, "Maps", loc);
+            }
+            else {
+                history.replaceState(history, "Maps", loc);
+            }
+        }
+    </script>
+
+</head>
+
+<body onload="load()">
+<div class="container">
+<h1>Purdue Maps</h1>
+<input id="buildings" hidden value="{{data}}" />
+    <input id="buildingName" hidden value="{{buildingName}}" />
+    <input id="floorName" hidden value="{{floorName}}" />
+    <input id="storedFileData" hidden value="{{storedFileData}}" />
+
+<select class="selectpicker" id="buildingpicker" data-style="btn-info" data-live-search="true" title="Choose Building">
+    <option></option>
+    {% for building in buildings %}
+        <option>{{building}}</option>
+    {% endfor %}
+</select>
+
+<select class="selectpicker" id="floorpicker" data-style="btn-info" data-live-search="true" title="Choose Floor">
+</select>
+</div>
+<br />
+<div style="position: absolute; left: 0; right: 0; bottom: 0.5%; top: 13%;">
+    <iframe src="" id="pdfFrame" hidden="true" height="100%" width="100%"></iframe>
+</div>
+</body>
+</html>

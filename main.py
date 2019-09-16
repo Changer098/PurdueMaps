@@ -6,8 +6,8 @@ import json
 
 class main:
     app = Flask(__name__)
-    # PDF_LOCATION = "C:\\Users\\everettr\\Documents\\PDF\\"
-    PDF_LOCATION = "/home/ryan/PDF/"
+    PDF_LOCATION = "C:\\Users\\everettr\\Documents\\PDF\\"
+    # PDF_LOCATION = "/home/ryan/PDF/"
     buildings = dict()  # buildings -> list(tuple(floor, filename)
     jString = None
     matchReg = re.compile("[a-zA-Z]+-[a-zA-Z0-9]+")
@@ -16,6 +16,9 @@ class main:
     def __init__(self):
         # Get buildings and their floors
         files = self.getFiles()
+        if files is None:
+            print("No Maps found");
+            exit(-1)
 
         for file in files:
             if self.matchReg.match(file) is not None:
@@ -51,7 +54,7 @@ class main:
                 return render_template('index.html', buildings=main.buildings, data=main.jString,
                                        buildingName=tokens[0].lower(), floorName=tokens[1], storedFileData=True)
             else:
-                print "{0} not in buildings".format(buildingName)
+                print("{0} not in buildings".format(buildingName))
                 return render_template('index.html', buildings=main.buildings, data=main.jString,
                                        buildingName=None, floorName=None, storedFileData=False)
         else:

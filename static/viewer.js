@@ -376,10 +376,14 @@ document.addEventListener('DOMContentLoaded', function () {
       window.requestAnimationFrame(resolve);
     });
 })();
-
-// We need to delay opening until all HTML is loaded.
-PDFViewerApplication.animationStartedPromise.then(function () {
-  PDFViewerApplication.open({
-    url: DEFAULT_URL,
+function show(pdf) {
+  // We need to delay opening until all HTML is loaded.
+  PDFViewerApplication.animationStartedPromise.then(function () {
+    PDFViewerApplication.open({
+      url: pdf,
+    });
   });
-});
+}
+function close() {
+  PDFViewerApplication.close()
+}

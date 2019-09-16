@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <!--https://getbootstrap.com/docs/4.2/examples/cover/#-->
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/css/bootstrap-select.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/js/bootstrap-select.min.js"></script>
-  <link rel="stylesheet" href="/static/pdf_viewer.css">
-    <link rel="stylesheet" type="text/css" href="/static/viewer.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/css/bootstrap-select.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/js/bootstrap-select.min.js"></script>
 
+    <link rel="stylesheet" href="/static/pdf_viewer.css">
+    <link rel="stylesheet" type="text/css" href="/static/viewer.css">
     <script src="/static/pdf.min.js"></script>
     <script src="/static/pdf_viewer.js"></script>
-  <script src="/static/viewer.js"></script>
+    <script src="/static/viewer.js"></script>
+
     <script type="text/javascript">
         var jsonData = null;
         var activeBuilding = null;
@@ -23,22 +25,22 @@
         var filename = null;
         var fileLocation = "/file/";
         var fileURL = "";
-        $(function() {
+        $(function () {
 
-          $('#buildingpicker').on('change', function(){
-            var selected = $(this).val();
-            if (activeFloor != null) {
-                activeFloor = null;
-                filename = null;
-                clearMap();
-            }
-            showFloors(selected);
-          });
-          $('#floorpicker').on('change', function() {
-            var selected = $(this).val();
-            //alert("Selected floor: " + selected + " on building: " + activeBuilding);
-            showMap(selected);
-          });
+            $('#buildingpicker').on('change', function () {
+                var selected = $(this).val();
+                if (activeFloor != null) {
+                    activeFloor = null;
+                    filename = null;
+                    clearMap();
+                }
+                showFloors(selected);
+            });
+            $('#floorpicker').on('change', function () {
+                var selected = $(this).val();
+                //alert("Selected floor: " + selected + " on building: " + activeBuilding);
+                showMap(selected);
+            });
         });
 
         function load() {
@@ -85,9 +87,9 @@
             $('#buildingpicker').children().remove()
             $('#buildingpicker').selectpicker('refresh');
             $("#buildingpicker").append($('<option>', {
-                    value: "",
-                    text: ""
-                }));
+                value: "",
+                text: ""
+            }));
             // add all the buildings
             buildings = Object.keys(jsonData);
             buildings.forEach(building => {
@@ -112,10 +114,10 @@
             $('#floorpicker').selectpicker('refresh');
             // refresh
             $("#floorpicker").append($('<option>', {
-                    value: "",
-                    text: ""
-                }));
-            jsonData[selected].forEach(function(floor) {
+                value: "",
+                text: ""
+            }));
+            jsonData[selected].forEach(function (floor) {
                 $("#floorpicker").append($('<option>', {
                     value: floor[0],
                     text: floor[0]
@@ -139,11 +141,12 @@
             }
             else {
                 activeFloor = selected;
-                data = jsonData[activeBuilding].find(function(element) { return element[0] == activeFloor;});
+                data = jsonData[activeBuilding].find(function (element) { return element[0] == activeFloor; });
                 filename = data[1].substr(0, data[1].indexOf('.'));
                 fileURL = fileLocation + filename + '.pdf';
                 $('#downloadbtn').show();
-                $('#downloadLink').attr({target: '_blank',
+                $('#downloadLink').attr({
+                    target: '_blank',
                     href: fileURL,
                     download: filename + '.pdf'
                 });
@@ -169,6 +172,8 @@
             $('#downloadbtn').hide();
             setLocation('/')
         }
+
+        // Sets the current web path
         function setLocation(loc) {
             var currentState = history.state;
             if (currentState == null) {
@@ -183,56 +188,60 @@
 </head>
 
 <body onload="load()">
-<div class="container">
-<h1>Purdue Maps</h1>
-<input id="buildings" hidden value="{{data}}" />
-    <input id="buildingName" hidden value="{{buildingName}}" />
-    <input id="floorName" hidden value="{{floorName}}" />
-    <input id="storedFileData" hidden value="{{storedFileData}}" />
+    <div class="container">
+        <h1>Purdue Maps</h1>
+        <input id="buildings" hidden value="{{data}}" />
+        <input id="buildingName" hidden value="{{buildingName}}" />
+        <input id="floorName" hidden value="{{floorName}}" />
+        <input id="storedFileData" hidden value="{{storedFileData}}" />
 
-<select class="selectpicker" id="buildingpicker" data-style="btn-info" data-live-search="true" title="Choose Building">
-    <option></option>
-    {% for building in buildings %}
-        <option>{{building}}</option>
-    {% endfor %}
-</select>
+        <select class="selectpicker" id="buildingpicker" data-style="btn-info" data-live-search="true"
+            title="Choose Building">
+            <option></option>
+            {% for building in buildings %}
+            <option>{{building}}</option>
+            {% endfor %}
+        </select>
 
-<select class="selectpicker" id="floorpicker" data-style="btn-info" data-live-search="true" title="Choose Floor">
-</select>
-<a href="#" id="downloadLink" download><button id="downloadbtn" class="btn material-icons">get_app</button></a>
-</div>
-<br />
-<div style="position: absolute; left: 0; right: 0; bottom: 0.5%; top: 13%;">
-    <iframe src="" id="pdfFrame" height="100%" width="100%"></iframe>
-    <div id="mobilePDF">
-        <div id="viewerContainer">
-            <div id="viewer" class="pdfViewer"></div>
-        </div>
-
-        <div id="loadingBar">
-            <div class="progress"></div>
-            <div class="glimmer"></div>
-        </div>
-
-        <div id="errorWrapper" hidden="true">
-            <div id="errorMessageLeft">
-                <span id="errorMessage"></span>
-                <button id="errorShowMore">
-                    More Information
-                </button>
-                <button id="errorShowLess">
-                    Less Information
-                </button>
+        <select class="selectpicker" id="floorpicker" data-style="btn-info" data-live-search="true"
+            title="Choose Floor">
+        </select>
+        <a href="#" id="downloadLink" download><button id="downloadbtn" class="btn material-icons">get_app</button></a>
+    </div>
+    <br />
+    <div style="position: absolute; left: 0; right: 0; bottom: 0.5%; top: 13%;">
+        <iframe src="" id="pdfFrame" height="100%" width="100%"></iframe>
+        <!--Modified version of Mozilla's pdf.js mobile viewer https://github.com/mozilla/pdf.js/tree/master/examples/mobile-viewer-->
+        <div id="mobilePDF">
+            <div id="viewerContainer">
+                <div id="viewer" class="pdfViewer"></div>
             </div>
-            <div id="errorMessageRight">
-                <button id="errorClose">
-                    Close
-                </button>
+
+            <div id="loadingBar">
+                <div class="progress"></div>
+                <div class="glimmer"></div>
             </div>
-            <div class="clearBoth"></div>
-            <textarea id="errorMoreInfo" hidden="true" readonly="readonly"></textarea>
+
+            <div id="errorWrapper" hidden="true">
+                <div id="errorMessageLeft">
+                    <span id="errorMessage"></span>
+                    <button id="errorShowMore">
+                        More Information
+                    </button>
+                    <button id="errorShowLess">
+                        Less Information
+                    </button>
+                </div>
+                <div id="errorMessageRight">
+                    <button id="errorClose">
+                        Close
+                    </button>
+                </div>
+                <div class="clearBoth"></div>
+                <textarea id="errorMoreInfo" hidden="true" readonly="readonly"></textarea>
+            </div>
         </div>
     </div>
-</div>
 </body>
+
 </html>

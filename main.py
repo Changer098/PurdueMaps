@@ -15,9 +15,9 @@ class main:
 
     def __init__(self):
         # Get buildings and their floors
-        files = self.getFiles()
+        files = self.get_files()
         if files is None:
-            print("No Maps found");
+            print("No Maps found")
             exit(-1)
 
         for file in files:
@@ -31,7 +31,14 @@ class main:
         main.jString = json.dumps(self.buildings, default=self.set_default)
         main.jString = main.jString
 
-    def getFiles(self):
+    def get_files(self):
+        """Gets all the PDF files in the location
+        
+        Returns
+        -------
+        files : list
+            List of all files in the directory
+        """
         for (dirpath, dirnames, filenames) in walk(self.PDF_LOCATION):
             return filenames
 
@@ -42,10 +49,27 @@ class main:
 
     @app.route('/')
     def index():
+        """The main page
+
+        Returns
+        -------
+        The main page formatted
+        """
         return render_template('index.html', buildings=main.buildings, data=main.jString, storedFileData=False)
 
     @app.route('/<string:filename>')
     def indexFilename(filename):
+        """The map page
+
+        Parameters
+        ----------
+        filename : str
+            The file being requested
+
+        Returns
+        -------
+        The map page formatted with the file data attached
+        """
         if main.matchReg.match(filename) is not None:
             tokens = main.splitReg.split(filename)
             buildingName = tokens[0].lower()
@@ -63,10 +87,32 @@ class main:
 
     @app.route('/file/<string:filename>')
     def file(filename):
+        """The map file
+
+        Parameters
+        ----------
+        filename : str
+            The file to retrieve
+
+        Returns
+        -------
+        The requested map file or a 404
+        """
         return send_file(main.PDF_LOCATION + filename)
 
     @app.route('/static/<path:path>')
     def staticfiles(path):
+        """Retrieves the requested static file
+        
+        Parameters
+        ----------
+        path: str
+            The file to retrieve
+
+        Returns
+        -------
+        The requested static file or a 404
+        """
         mimetype = 'text/html'
         if '.js' in path:
             mimetype = 'text/javascript'
